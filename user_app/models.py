@@ -4,7 +4,7 @@ from django.utils import timezone
 import random
 import string
 
-# Custom User Manager
+
 class CustomUserManager(BaseUserManager):
     def create_user(self, email, name, mobile_number, city, password=None):
         if not email:
@@ -21,7 +21,7 @@ class CustomUserManager(BaseUserManager):
         user.save(using=self._db)
         return user
 
-# User model with referral code and relation to referred users
+
 class User(AbstractBaseUser):
     email = models.EmailField(unique=True)
     name = models.CharField(max_length=255)
@@ -41,14 +41,14 @@ class User(AbstractBaseUser):
     objects = CustomUserManager()
 
     def save(self, *args, **kwargs):
-        if not self.referral_code:  # Only generate if not set
+        if not self.referral_code:  
             self.referral_code = self.generate_unique_referral_code()
         super().save(*args, **kwargs)
 
     def generate_unique_referral_code(self):
         while True:
             code = ''.join(random.choices(string.ascii_uppercase + string.digits, k=10))
-            if not User.objects.filter(referral_code=code).exists():  # Ensure uniqueness
+            if not User.objects.filter(referral_code=code).exists(): 
                 return code
 
     def __str__(self):
